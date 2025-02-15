@@ -58,14 +58,14 @@ jobs:
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-    - name: Create VPS if it doesn't exist
+    - name: Use existing VPS (go-scale-btob-droplets)
       run: |
-        if ! doctl compute droplet list | grep -q 'mautic-vps'; then
-          doctl compute droplet create mautic-vps --image docker-20-04 --size s-1vcpu-1gb --region nyc1 --ssh-keys ${{ secrets.DIGITALOCEAN_SSH_FINGERPRINT }} --wait --user-data-file setup-vps.sh --enable-monitoring
+        if doctl compute droplet list | grep -q 'go-scale-btob-droplets'; then
+          echo "Using existing droplet: go-scale-btob-droplets"
           echo "droplet_created=true" >> $GITHUB_ENV
         else
-          echo "Droplet 'mautic-vps' already exists."
-          echo "droplet_created=true" >> $GITHUB_ENV
+          echo "Error: The droplet 'go-scale-btob-droplets' does not exist!"
+          exit 1
         fi
 
     - name: Get VPS IP
